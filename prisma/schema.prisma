@@ -14,10 +14,11 @@ datasource db {
 }
 
 model User {
-  id            String @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
-  email         String @unique
-  password_hash String // o hash funciona de forma com que não seja possível reverter a senha original.
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
 
   checkIns CheckIn[]
 
@@ -29,7 +30,7 @@ model CheckIn {
   created_at   DateTime  @default(now())
   validated_at DateTime?
 
-  user    User   @relation(fields: [user_id], references: [id]) //esse tipo de declaração nao cria uma coluna na tabela
+  user    User   @relation(fields: [user_id], references: [id])
   user_id String
 
   gym    Gym    @relation(fields: [gym_id], references: [id])
@@ -41,8 +42,8 @@ model CheckIn {
 model Gym {
   id          String  @id @default(uuid())
   title       String
-  description String
-  phone       String
+  description String?
+  phone       String?
   latitude    Decimal
   longitude   Decimal
 

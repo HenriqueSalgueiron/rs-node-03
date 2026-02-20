@@ -1,9 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { RegisterUseCase, RegisterUseCaseRequest } from "./register";
+import { describe, expect, it } from "vitest";
+import { RegisterUseCaseRequest } from "../register";
 import { compare } from "bcryptjs";
-import { InMemoryUsersRepository } from "~/repositories/in-memory/in-memory-users-repository";
-import { UserAlreadyExistsError } from "./errors/user-already-exists-error";
-import { MakeRegisterUseCase } from "./factories/make-register-use-case";
+import { UserAlreadyExistsError } from "../errors/user-already-exists-error";
+import { MakeRegisterUseCase } from "../factories/make-register-use-case";
 
 describe("Register Use Case", () => {
   it("should be able to register", async () => {

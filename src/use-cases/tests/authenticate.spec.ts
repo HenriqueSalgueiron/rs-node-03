@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hash } from "bcryptjs";
-import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
-import { MakeAuthenticateUseCase } from "./factories/make-authenticate-use-case";
+import { InvalidCredentialsError } from "../errors/invalid-credentials-error";
+import { MakeAuthenticateUseCase } from "../factories/make-authenticate-use-case";
 
 describe("Authenticate Use Case", () => {
   it("should be able to authenticate", async () => {

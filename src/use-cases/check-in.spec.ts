@@ -1,32 +1,65 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { hash } from "bcryptjs";
 import { InMemoryUsersRepository } from "~/repositories/in-memory/in-memory-users-repository";
 import { InMemoryCheckinsRepository } from "~/repositories/in-memory/in-memory-checkins-repository";
 import { email } from "zod";
 import { CheckinUseCase } from "./check-in";
 
+let checkInsRepository: InMemoryCheckinsRepository;
+let sut: CheckinUseCase;
+
 describe("Check-in Use Case", () => {
-  it("should be able to checkin", async () => {
-    const usersRepository = new InMemoryUsersRepository();
-    const checkInRepository = new InMemoryCheckinsRepository();
-    const checkInUseCase = new CheckinUseCase(checkInRepository);
+  beforeEach(() => {
+    checkInsRepository = new InMemoryCheckinsRepository();
+    sut = new CheckinUseCase(checkInsRepository);
 
-    const user = await usersRepository.create({
-      name: "John Doe",
-      email: "john.doe@example.com",
-      password_hash: await hash("123456", 6),
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should be able to check in", async () => {
+    const { checkin } = await sut.execute({
+      gymId: "gym-01",
+      userId: "user-01",
     });
 
-    const checkIn = await checkInUseCase.execute({
-      gymId: "gym-123",
-      userId: user.id,
+    expect(checkin.id).toEqual(expect.any(String));
+  });
+
+  it("should not be able to check in twice in the same day", async () => {
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+
+    await sut.execute({
+      gymId: "gym-01",
+      userId: "user-01",
     });
 
-    expect(checkIn).toMatchObject({
-      checkin: {
-        gym_id: "gym-123",
-        user_id: user.id,
-      },
+    await expect(() =>
+      sut.execute({
+        gymId: "gym-01",
+        userId: "user-01",
+      }),
+    ).rejects.toBeInstanceOf(Error);
+  });
+
+  it("should be able to check in twice but in different days", async () => {
+    vi.setSystemTime(new Date(2022, 0, 20, 8, 0, 0));
+
+    await sut.execute({
+      gymId: "gym-01",
+      userId: "user-01",
     });
+
+    vi.setSystemTime(new Date(2022, 0, 21, 8, 0, 0));
+
+    const { checkin } = await sut.execute({
+      gymId: "gym-01",
+      userId: "user-01",
+    });
+
+    expect(checkin.id).toEqual(expect.any(String));
   });
 });

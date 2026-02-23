@@ -5,5 +5,5 @@ export function MakeAuthenticateUseCase() {
   const usersRepository = new InMemoryUsersRepository();
   const authenticateUseCase = new AuthenticateUseCase(usersRepository);
 
-  return { authenticateUseCase, usersRepository };
+  return authenticateUseCase;
 }
